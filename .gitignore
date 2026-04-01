@@ -1,0 +1,25 @@
+﻿# Compiled files
+target/
+*.class
+*.jar
+*.war
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+
+# Frontend
+node_modules/
+build/
+dist/
+.env
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

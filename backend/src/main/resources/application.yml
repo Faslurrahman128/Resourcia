@@ -1,0 +1,21 @@
+﻿spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://faslurrahman128_db_user:kOxgVRSn7VTs3KJf@cluster0.eld9teq.mongodb.net/smart_campus?retryWrites=true&w=majority&appName=Cluster0
+      database: smart_campus
+  
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+logging:
+  level:
+    com.smartcampus: DEBUG
+    org.springframework.data.mongodb: DEBUG
