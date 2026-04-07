@@ -11,6 +11,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
+        @ExceptionHandler(SecurityException.class)
+        public ResponseEntity<Map<String, String>> handleSecurity(SecurityException ex) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
     @ExceptionHandler(BookingNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(BookingNotFoundException ex) {
         Map<String, String> error = new HashMap<>();

@@ -3,47 +3,84 @@ package com.smartcampus.booking.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.index.Indexed;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 
-@Document(collection = "bookings")
+@Entity
+@Table(name = "bookings")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Booking {
     
     @Id
-    private String id;
-    
-    @Indexed
-    private String resourceId;
-    
-    @Indexed
-    private String userId;
-    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "booking_id")
+    private Long id;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "resource_id", nullable = false)
+    private Long resourceId;
+
+    @Column(name = "date", nullable = false)
     private LocalDate bookingDate;
+
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
+
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
+
+    @Column(name = "purpose", columnDefinition = "TEXT")
     private String purpose;
+
+    @Column(name = "attendees")
     private Integer expectedAttendees;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private BookingStatus status = BookingStatus.PENDING;
+
+    @Column(name = "admin_reason", columnDefinition = "TEXT")
     private String rejectionReason;
-    private String approvedBy;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "approved_by")
+    private String approvedBy;
+
+    public String getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(String approvedBy) {
+        this.approvedBy = approvedBy;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
     
     public boolean overlaps(LocalTime otherStart, LocalTime otherEnd) {
         return !(this.endTime.isBefore(otherStart) || this.startTime.isAfter(otherEnd));
     }
-    
+
     public boolean canBeCancelled() {
         return this.status == BookingStatus.APPROVED;
     }
-    
+
     public boolean isPending() {
         return this.status == BookingStatus.PENDING;
     }

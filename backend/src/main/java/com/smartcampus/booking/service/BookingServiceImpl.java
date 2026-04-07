@@ -34,8 +34,8 @@ public class BookingServiceImpl implements BookingService {
         }
         
         Booking booking = new Booking();
-        booking.setResourceId(request.getResourceId());
-        booking.setUserId(userId);
+        booking.setResourceId(Long.parseLong(request.getResourceId()));
+        booking.setUserId(Long.parseLong(userId));
         booking.setBookingDate(request.getBookingDate());
         booking.setStartTime(request.getStartTime());
         booking.setEndTime(request.getEndTime());
@@ -57,8 +57,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponse updateBookingStatus(String bookingId, BookingStatusUpdateRequest request, String adminId) {
         log.info("Updating booking {} status to {} by admin: {}", bookingId, request.getStatus(), adminId);
-        
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findById(Long.parseLong(bookingId))
             .orElseThrow(() -> new BookingNotFoundException(bookingId));
         
         if (!booking.isPending()) {
@@ -85,8 +84,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponse cancelBooking(String bookingId, String userId) {
         log.info("Cancelling booking {} by user: {}", bookingId, userId);
-        
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findById(Long.parseLong(bookingId))
             .orElseThrow(() -> new BookingNotFoundException(bookingId));
         
         if (!booking.getUserId().equals(userId)) {
@@ -106,7 +104,7 @@ public class BookingServiceImpl implements BookingService {
     
     @Override
     public BookingResponse getBookingById(String bookingId, String userId, boolean isAdmin) {
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findById(Long.parseLong(bookingId))
             .orElseThrow(() -> new BookingNotFoundException(bookingId));
         
         if (!booking.getUserId().equals(userId) && !isAdmin) {
@@ -118,7 +116,7 @@ public class BookingServiceImpl implements BookingService {
     
     @Override
     public Page<BookingResponse> getUserBookings(String userId, Pageable pageable) {
-        return bookingRepository.findByUserId(userId, pageable)
+        return bookingRepository.findByUserId(Long.parseLong(userId), pageable)
             .map(this::mapToResponse);
     }
     
@@ -132,7 +130,7 @@ public class BookingServiceImpl implements BookingService {
     
     @Override
     public void deleteBooking(String bookingId, String adminId) {
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findById(Long.parseLong(bookingId))
             .orElseThrow(() -> new BookingNotFoundException(bookingId));
         
         bookingRepository.delete(booking);
@@ -173,9 +171,9 @@ public class BookingServiceImpl implements BookingService {
     
     private BookingResponse mapToResponse(Booking booking) {
         return BookingResponse.builder()
-            .id(booking.getId())
-            .resourceId(booking.getResourceId())
-            .userId(booking.getUserId())
+            .id(String.valueOf(booking.getId()))
+            .resourceId(String.valueOf(booking.getResourceId()))
+            .userId(String.valueOf(booking.getUserId()))
             .bookingDate(booking.getBookingDate())
             .startTime(booking.getStartTime())
             .endTime(booking.getEndTime())
@@ -183,7 +181,7 @@ public class BookingServiceImpl implements BookingService {
             .expectedAttendees(booking.getExpectedAttendees())
             .status(booking.getStatus())
             .rejectionReason(booking.getRejectionReason())
-            .approvedBy(booking.getApprovedBy())
+            // .approvedBy(booking.getApprovedBy()) // removed, not present in Booking
             .createdAt(booking.getCreatedAt())
             .updatedAt(booking.getUpdatedAt())
             .build();

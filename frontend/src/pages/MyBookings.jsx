@@ -32,8 +32,7 @@ const MyBookings = ({ user }) => {
     if (action === 'cancel') {
       if (window.confirm('Are you sure you want to cancel this booking?')) {
         try {
-          const token = localStorage.getItem('token');
-          await bookingService.cancelBooking(booking.id, token);
+          await bookingService.cancelBooking(booking.id, user.id);
           toast.success('Booking cancelled successfully');
           loadBookings();
         } catch (error) {

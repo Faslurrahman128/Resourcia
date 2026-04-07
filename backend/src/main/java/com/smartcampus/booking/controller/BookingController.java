@@ -1,5 +1,7 @@
 package com.smartcampus.booking.controller;
 
+import java.util.Map;
+
 import com.smartcampus.booking.dto.request.BookingCreateRequest;
 import com.smartcampus.booking.dto.request.BookingStatusUpdateRequest;
 import com.smartcampus.booking.dto.response.BookingResponse;
@@ -87,8 +89,9 @@ public class BookingController {
     }
     
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<BookingResponse> cancelBooking(@PathVariable String id) {
-        BookingResponse response = bookingService.cancelBooking(id, getCurrentUserId());
+    public ResponseEntity<BookingResponse> cancelBooking(@PathVariable String id, @RequestBody Map<String, String> body) {
+        String userId = body.get("userId");
+        BookingResponse response = bookingService.cancelBooking(id, userId);
         return ResponseEntity.ok(response);
     }
     
