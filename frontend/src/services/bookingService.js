@@ -24,31 +24,22 @@ api.interceptors.request.use(
   }
 );
 
+const buildUserHeaders = (user) => {
+  if (!user) {
+    return {};
+  }
+
+  return {
+    'X-User-Id': String(user.id),
+    'X-User-Role': String(user.role || 'USER')
+  };
+};
+
 const bookingService = {
-  createBooking: async (bookingData) => {
+  createBooking: async (bookingData, user) => {
     try {
-      const response = await api.post('/bookings', bookingData);
-      return response.data;
-    } catch (error) {
-      console.error('API Error:', error.response?.data);
-      throw error.response?.data || error.message;
-    }
-  },
-
-  getUserBookings: async (userId) => {
-    try {
-      const response = await api.get('/bookings/user/' + userId);
-      return response.data;
-    } catch (error) {
-      console.error('API Error:', error.response?.data);
-      throw error.response?.data || error.message;
-    }
-  },
-
-  getAllBookings: async (filters = {}) => {
-    try {
-      const response = await api.get('/bookings', {
-        params: filters
+      const response = await api.post('/bookings', bookingData, {
+        headers: buildUserHeaders(user)
       });
       return response.data;
     } catch (error) {
@@ -57,9 +48,11 @@ const bookingService = {
     }
   },
 
-  getBookingById: async (id) => {
+  getUserBookings: async (userId, user) => {
     try {
-      const response = await api.get('/bookings/' + id);
+      const response = await api.get('/bookings/user/' + userId, {
+        headers: buildUserHeaders(user)
+      });
       return response.data;
     } catch (error) {
       console.error('API Error:', error.response?.data);
@@ -67,9 +60,12 @@ const bookingService = {
     }
   },
 
-  updateBookingStatus: async (id, statusData) => {
+  getAllBookings: async (filters = {}, user) => {
     try {
-      const response = await api.patch('/bookings/' + id + '/status', statusData);
+      const response = await api.get('/bookings', {
+        params: filters,
+        headers: buildUserHeaders(user)
+      });
       return response.data;
     } catch (error) {
       console.error('API Error:', error.response?.data);
@@ -77,9 +73,11 @@ const bookingService = {
     }
   },
 
-  cancelBooking: async (id, userId) => {
+  getBookingById: async (id, user) => {
     try {
-      const response = await api.put('/bookings/' + id + '/cancel', { userId });
+      const response = await api.get('/bookings/' + id, {
+        headers: buildUserHeaders(user)
+      });
       return response.data;
     } catch (error) {
       console.error('API Error:', error.response?.data);
@@ -87,9 +85,47 @@ const bookingService = {
     }
   },
 
-  deleteBooking: async (id) => {
+  updateBooking: async (id, bookingData, user) => {
     try {
-      const response = await api.delete('/bookings/' + id);
+      const response = await api.put('/bookings/' + id, bookingData, {
+        headers: buildUserHeaders(user)
+      });
+      return response.data;
+    } catch (error) {
+      console.error('API Error:', error.response?.data);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  updateBookingStatus: async (id, statusData, user) => {
+    try {
+      const response = await api.patch('/bookings/' + id + '/status', statusData, {
+        headers: buildUserHeaders(user)
+      });
+      return response.data;
+    } catch (error) {
+      console.error('API Error:', error.response?.data);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  cancelBooking: async (id, user) => {
+    try {
+      const response = await api.put('/bookings/' + id + '/cancel', {}, {
+        headers: buildUserHeaders(user)
+      });
+      return response.data;
+    } catch (error) {
+      console.error('API Error:', error.response?.data);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  deleteBooking: async (id, user) => {
+    try {
+      const response = await api.delete('/bookings/' + id, {
+        headers: buildUserHeaders(user)
+      });
       return response.data;
     } catch (error) {
       console.error('API Error:', error.response?.data);

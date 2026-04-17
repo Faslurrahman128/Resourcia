@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @Builder
 public class BookingResponse {
     private String id;
-    private String resourceId;
+    private Long resourceId;
     private String resourceName;
     private String resourceType;
     private String resourceLocation;
