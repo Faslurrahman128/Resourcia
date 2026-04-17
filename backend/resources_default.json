@@ -1,0 +1,7 @@
+[
+  { "name": "A301", "building": "Main Building", "type": "Lecture Hall", "status": "ACTIVE", "capacity": 100, "location": "First Floor", "availabilityStart": "08:00", "availabilityEnd": "18:00" },
+  { "name": "A302", "building": "Main Building", "type": "Lecture Hall", "status": "ACTIVE", "capacity": 80, "location": "First Floor", "availabilityStart": "08:00", "availabilityEnd": "18:00" },
+  { "name": "B301", "building": "Main Building", "type": "Lecture Hall", "status": "ACTIVE", "capacity": 90, "location": "Second Floor", "availabilityStart": "08:00", "availabilityEnd": "18:00" },
+  { "name": "F301", "building": "New Building", "type": "Lecture Hall", "status": "ACTIVE", "capacity": 120, "location": "Third Floor", "availabilityStart": "08:00", "availabilityEnd": "18:00" },
+  { "name": "F302", "building": "New Building", "type": "Lecture Hall", "status": "ACTIVE", "capacity": 110, "location": "Third Floor", "availabilityStart": "08:00", "availabilityEnd": "18:00" }
+]

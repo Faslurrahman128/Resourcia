@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import bookingService from '../../services/bookingService';
 
-const BookingForm = ({ resourceId, onSuccess, onClose }) => {
+const BookingForm = ({ resourceId, user, onSuccess, onClose }) => {
   const [formData, setFormData] = useState({
-    resourceId: resourceId || '',  // Make sure this is empty string initially
+    resourceId: resourceId || '',
     bookingDate: '',
-    startTime: '',
-    endTime: '',
+    startHour: '',
+    startMinute: '00',
+    startPeriod: '',
+    endHour: '',
+    endMinute: '00',
+    endPeriod: '',
     purpose: '',
     expectedAttendees: 1
   });
@@ -17,8 +21,13 @@ const BookingForm = ({ resourceId, onSuccess, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.resourceId || formData.resourceId.trim() === '') {
+    if (!formData.resourceId) {
       newErrors.resourceId = 'Resource ID is required';
+    } else {
+      const numericResourceId = Number(formData.resourceId);
+      if (!Number.isInteger(numericResourceId) || numericResourceId <= 0) {
+        newErrors.resourceId = 'Invalid Resource ID';
+      }
     }
     
     if (!formData.bookingDate) {
@@ -32,17 +41,31 @@ const BookingForm = ({ resourceId, onSuccess, onClose }) => {
       }
     }
     
-    if (!formData.startTime) {
+    if (!formData.startHour || !formData.startMinute || !formData.startPeriod) {
       newErrors.startTime = 'Start time is required';
     }
-    
-    if (!formData.endTime) {
+    if (!formData.endHour || !formData.endMinute || !formData.endPeriod) {
       newErrors.endTime = 'End time is required';
     }
-    
-    if (formData.startTime && formData.endTime) {
-      if (formData.startTime >= formData.endTime) {
+    if (formData.startHour && formData.startMinute && formData.startPeriod && formData.endHour && formData.endMinute && formData.endPeriod) {
+      // Convert to 24-hour for comparison
+      let sHour = parseInt(formData.startHour, 10);
+      let eHour = parseInt(formData.endHour, 10);
+      if (formData.startPeriod === 'PM' && sHour !== 12) sHour += 12;
+      if (formData.startPeriod === 'AM' && sHour === 12) sHour = 0;
+      if (formData.endPeriod === 'PM' && eHour !== 12) eHour += 12;
+      if (formData.endPeriod === 'AM' && eHour === 12) eHour = 0;
+      const sMin = parseInt(formData.startMinute, 10);
+      const eMin = parseInt(formData.endMinute, 10);
+      const start = sHour * 60 + sMin;
+      const end = eHour * 60 + eMin;
+      if (start >= end) {
         newErrors.endTime = 'End time must be after start time';
+      } else {
+        const duration = end - start;
+        if (duration > 180) {
+          newErrors.endTime = 'Booking cannot exceed 3 hours';
+        }
       }
     }
     
@@ -83,11 +106,23 @@ const BookingForm = ({ resourceId, onSuccess, onClose }) => {
     setLoading(true);
     
     // Prepare data exactly as backend expects
+    // Convert to 24-hour format for backend
+    function to24Hour(hour, minute, period) {
+      let h = parseInt(hour, 10);
+      if (period === 'PM' && h !== 12) h += 12;
+      if (period === 'AM' && h === 12) h = 0;
+      return `${h.toString().padStart(2, '0')}:${minute}`;
+    }
+
     const requestData = {
-      resourceId: formData.resourceId.trim(),
+      resourceId: Number(formData.resourceId),
       bookingDate: formData.bookingDate,
-      startTime: formData.startTime,
-      endTime: formData.endTime,
+      startTime: (formData.startHour && formData.startMinute && formData.startPeriod)
+        ? to24Hour(formData.startHour, formData.startMinute, formData.startPeriod)
+        : '',
+      endTime: (formData.endHour && formData.endMinute && formData.endPeriod)
+        ? to24Hour(formData.endHour, formData.endMinute, formData.endPeriod)
+        : '',
       purpose: formData.purpose.trim(),
       expectedAttendees: parseInt(formData.expectedAttendees)
     };
@@ -95,7 +130,7 @@ const BookingForm = ({ resourceId, onSuccess, onClose }) => {
     console.log('Sending to backend:', requestData);
     
     try {
-      const response = await bookingService.createBooking(requestData);
+      const response = await bookingService.createBooking(requestData, user);
       console.log('Response from backend:', response);
       toast.success('Booking request submitted successfully!');
       onSuccess();
@@ -127,11 +162,17 @@ const BookingForm = ({ resourceId, onSuccess, onClose }) => {
           <div className="form-group">
             <label>Resource ID *</label>
             <input
-              type="text"
+              type="number"
               name="resourceId"
               value={formData.resourceId}
               onChange={handleChange}
-              placeholder="Enter resource ID (e.g., resource1, room101, lab202)"
+              min="1"
+              readOnly={Boolean(resourceId)}
+              style={{
+                background: resourceId ? '#eee' : '#fff',
+                color: '#333',
+                cursor: resourceId ? 'not-allowed' : 'text'
+              }}
             />
             {errors.resourceId && <small style={{color: 'red'}}>{errors.resourceId}</small>}
           </div>
@@ -150,23 +191,77 @@ const BookingForm = ({ resourceId, onSuccess, onClose }) => {
           
           <div className="form-group">
             <label>Start Time *</label>
-            <input
-              type="time"
-              name="startTime"
-              value={formData.startTime}
-              onChange={handleChange}
-            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <select
+                name="startHour"
+                value={formData.startHour}
+                onChange={handleChange}
+              >
+                <option value="">Hour</option>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i+1} value={String(i+1)}>{i+1}</option>
+                ))}
+              </select>
+              <span>:</span>
+              <select
+                name="startMinute"
+                value={formData.startMinute}
+                onChange={handleChange}
+                style={{ width: 50 }}
+              >
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+              </select>
+              <select
+                name="startPeriod"
+                value={formData.startPeriod}
+                onChange={handleChange}
+              >
+                <option value="">AM/PM</option>
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
             {errors.startTime && <small style={{color: 'red'}}>{errors.startTime}</small>}
           </div>
           
           <div className="form-group">
             <label>End Time *</label>
-            <input
-              type="time"
-              name="endTime"
-              value={formData.endTime}
-              onChange={handleChange}
-            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <select
+                name="endHour"
+                value={formData.endHour}
+                onChange={handleChange}
+              >
+                <option value="">Hour</option>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i+1} value={String(i+1)}>{i+1}</option>
+                ))}
+              </select>
+              <span>:</span>
+              <select
+                name="endMinute"
+                value={formData.endMinute}
+                onChange={handleChange}
+                style={{ width: 50 }}
+              >
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+              </select>
+              <select
+                name="endPeriod"
+                value={formData.endPeriod}
+                onChange={handleChange}
+              >
+                <option value="">AM/PM</option>
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
             {errors.endTime && <small style={{color: 'red'}}>{errors.endTime}</small>}
           </div>
           

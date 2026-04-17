@@ -34,7 +34,7 @@ public class BookingServiceImpl implements BookingService {
         }
         
         Booking booking = new Booking();
-        booking.setResourceId(Long.parseLong(request.getResourceId()));
+        booking.setResourceId(request.getResourceId());
         booking.setUserId(Long.parseLong(userId));
         booking.setBookingDate(request.getBookingDate());
         booking.setStartTime(request.getStartTime());
@@ -52,6 +52,40 @@ public class BookingServiceImpl implements BookingService {
         log.info("Booking created successfully with ID: {}", savedBooking.getId());
         
         return mapToResponse(savedBooking);
+    }
+
+    @Override
+    public BookingResponse updateBooking(String bookingId, BookingCreateRequest request, String userId, boolean isAdmin) {
+        log.info("Updating booking {} by user: {}", bookingId, userId);
+
+        if (!request.isTimeRangeValid()) {
+            throw new IllegalArgumentException("Start time must be before end time");
+        }
+
+        Long userIdLong = Long.parseLong(userId);
+        Booking booking = bookingRepository.findById(Long.parseLong(bookingId))
+            .orElseThrow(() -> new BookingNotFoundException(bookingId));
+
+        if (!booking.getUserId().equals(userIdLong) && !isAdmin) {
+            throw new SecurityException("You can only update your own bookings");
+        }
+
+        if (!booking.isPending()) {
+            throw new IllegalStateException("Only pending bookings can be updated");
+        }
+
+        booking.setResourceId(request.getResourceId());
+        booking.setBookingDate(request.getBookingDate());
+        booking.setStartTime(request.getStartTime());
+        booking.setEndTime(request.getEndTime());
+        booking.setPurpose(request.getPurpose());
+        booking.setExpectedAttendees(request.getExpectedAttendees());
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        validateNoConflict(booking);
+
+        Booking updatedBooking = bookingRepository.save(booking);
+        return mapToResponse(updatedBooking);
     }
     
     @Override
@@ -86,19 +120,15 @@ public class BookingServiceImpl implements BookingService {
         log.info("Cancelling booking {} by user: {}", bookingId, userId);
         Booking booking = bookingRepository.findById(Long.parseLong(bookingId))
             .orElseThrow(() -> new BookingNotFoundException(bookingId));
-        
-        if (!booking.getUserId().equals(userId)) {
+        if (!booking.getUserId().toString().equals(userId)) {
             throw new SecurityException("You can only cancel your own bookings");
         }
-        
         if (!booking.canBeCancelled()) {
             throw new IllegalStateException("Only approved bookings can be cancelled");
         }
-        
         booking.setStatus(BookingStatus.CANCELLED);
         booking.setUpdatedAt(LocalDateTime.now());
         Booking cancelledBooking = bookingRepository.save(booking);
-        
         return mapToResponse(cancelledBooking);
     }
     
@@ -106,8 +136,9 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponse getBookingById(String bookingId, String userId, boolean isAdmin) {
         Booking booking = bookingRepository.findById(Long.parseLong(bookingId))
             .orElseThrow(() -> new BookingNotFoundException(bookingId));
+        Long userIdLong = Long.parseLong(userId);
         
-        if (!booking.getUserId().equals(userId) && !isAdmin) {
+        if (!booking.getUserId().equals(userIdLong) && !isAdmin) {
             throw new SecurityException("You don't have permission to view this booking");
         }
         
@@ -124,7 +155,11 @@ public class BookingServiceImpl implements BookingService {
     public Page<BookingResponse> getAllBookings(String resourceId, String userId, String status, 
                                                  LocalDate startDate, LocalDate endDate, 
                                                  Pageable pageable) {
-        return bookingRepository.findAll(pageable)
+        Long resourceIdLong = (resourceId == null || resourceId.isBlank()) ? null : Long.parseLong(resourceId);
+        Long userIdLong = (userId == null || userId.isBlank()) ? null : Long.parseLong(userId);
+        BookingStatus bookingStatus = (status == null || status.isBlank()) ? null : BookingStatus.valueOf(status.toUpperCase());
+
+        return bookingRepository.findWithFilters(resourceIdLong, userIdLong, bookingStatus, startDate, endDate, pageable)
             .map(this::mapToResponse);
     }
     
@@ -172,7 +207,7 @@ public class BookingServiceImpl implements BookingService {
     private BookingResponse mapToResponse(Booking booking) {
         return BookingResponse.builder()
             .id(String.valueOf(booking.getId()))
-            .resourceId(String.valueOf(booking.getResourceId()))
+            .resourceId(booking.getResourceId())
             .userId(String.valueOf(booking.getUserId()))
             .bookingDate(booking.getBookingDate())
             .startTime(booking.getStartTime())

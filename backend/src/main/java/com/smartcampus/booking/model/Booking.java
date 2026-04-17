@@ -74,7 +74,8 @@ public class Booking {
     }
     
     public boolean overlaps(LocalTime otherStart, LocalTime otherEnd) {
-        return !(this.endTime.isBefore(otherStart) || this.startTime.isAfter(otherEnd));
+        // Adjacent slots are allowed: [09:00-10:00] does not conflict with [10:00-11:00].
+        return this.startTime.isBefore(otherEnd) && otherStart.isBefore(this.endTime);
     }
 
     public boolean canBeCancelled() {
