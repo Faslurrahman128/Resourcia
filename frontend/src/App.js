@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import MyBookings from './pages/MyBookings';
 import AdminBookings from './pages/AdminBookings';
+import AdminResourcesApp from './pages/AdminResources';
+import UserResourcesApp from './pages/UserResources';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ function App() {
             <Route path="/" element={<Navigate to="/my-bookings" />} />
             <Route path="/my-bookings" element={<MyBookings user={mockUser} />} />
             <Route path="/admin-bookings" element={<AdminBookings user={mockUser} />} />
+            <Route path="/user-resources" element={<UserResourcesApp userName={mockUser.name} userInitial="U" />} />
+            <Route path="/admin-resources" element={<AdminResourcesApp adminName={mockUser.name} adminInitial="A" />} />
           </Routes>
         </div>
       </Router>
