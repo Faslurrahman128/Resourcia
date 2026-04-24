@@ -24,7 +24,7 @@ public class Booking {
     private Long userId;
 
     @Column(name = "resource_id", nullable = false)
-    private String resourceId;
+    private Long resourceId;
 
     @Column(name = "date", nullable = false)
     private LocalDate bookingDate;

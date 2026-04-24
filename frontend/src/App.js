@@ -16,14 +16,7 @@ function App() {
     id: 1,
     name: 'John Doe',
     email: 'john@example.com',
-    role: 'USER'
-  };
-
-  const adminMock = {
-    id: 1,
-    name: 'Admin User',
-    email: 'admin@example.com',
-    role: 'ADMIN'
+    role: 'USER' // or 'ADMIN'
   };
 
   return (
@@ -33,12 +26,10 @@ function App() {
           <Toaster position="top-right" />
           <Routes>
             <Route path="/" element={<Navigate to="/my-bookings" />} />
-            {/* Your Booking Routes */}
             <Route path="/my-bookings" element={<MyBookings user={mockUser} />} />
-            <Route path="/admin-bookings" element={<AdminBookings user={adminMock} />} />
-            {/* Resource Routes from main */}
+            <Route path="/admin-bookings" element={<AdminBookings user={mockUser} />} />
             <Route path="/user-resources" element={<UserResourcesApp userName={mockUser.name} userInitial="U" />} />
-            <Route path="/admin-resources" element={<AdminResourcesApp adminName={adminMock.name} adminInitial="A" />} />
+            <Route path="/admin-resources" element={<AdminResourcesApp adminName={mockUser.name} adminInitial="A" />} />
           </Routes>
         </div>
       </Router>

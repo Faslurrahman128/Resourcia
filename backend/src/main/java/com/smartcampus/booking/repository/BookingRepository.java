@@ -15,7 +15,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Page<Booking> findByUserId(Long userId, Pageable pageable);
 
-       List<Booking> findByResourceIdAndBookingDate(String resourceId, LocalDate bookingDate);
+    List<Booking> findByResourceIdAndBookingDate(Long resourceId, LocalDate bookingDate);
 
     @Query("SELECT b FROM Booking b " +
            "WHERE (:resourceId IS NULL OR b.resourceId = :resourceId) " +
@@ -23,7 +23,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
            "AND (:status IS NULL OR b.status = :status) " +
            "AND (:startDate IS NULL OR b.bookingDate >= :startDate) " +
            "AND (:endDate IS NULL OR b.bookingDate <= :endDate)")
-       Page<Booking> findWithFilters(@Param("resourceId") String resourceId,
+    Page<Booking> findWithFilters(@Param("resourceId") Long resourceId,
                                   @Param("userId") Long userId,
                                   @Param("status") com.smartcampus.booking.model.BookingStatus status,
                                   @Param("startDate") LocalDate startDate,

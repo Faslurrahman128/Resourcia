@@ -24,10 +24,9 @@ const BookingForm = ({ resourceId, user, onSuccess, onClose }) => {
     if (!formData.resourceId) {
       newErrors.resourceId = 'Resource ID is required';
     } else {
-      const hallCode = formData.resourceId.trim().toUpperCase();
-      const hallPattern = /^(A|B|F|G)\d{3,4}$/;
-      if (!hallPattern.test(hallCode)) {
-        newErrors.resourceId = 'Invalid Resource ID. Example: A303, F1305';
+      const numericResourceId = Number(formData.resourceId);
+      if (!Number.isInteger(numericResourceId) || numericResourceId <= 0) {
+        newErrors.resourceId = 'Invalid Resource ID';
       }
     }
     
@@ -116,7 +115,7 @@ const BookingForm = ({ resourceId, user, onSuccess, onClose }) => {
     }
 
     const requestData = {
-      resourceId: formData.resourceId.trim().toUpperCase(),
+      resourceId: Number(formData.resourceId),
       bookingDate: formData.bookingDate,
       startTime: (formData.startHour && formData.startMinute && formData.startPeriod)
         ? to24Hour(formData.startHour, formData.startMinute, formData.startPeriod)
@@ -163,10 +162,11 @@ const BookingForm = ({ resourceId, user, onSuccess, onClose }) => {
           <div className="form-group">
             <label>Resource ID *</label>
             <input
-              type="text"
+              type="number"
               name="resourceId"
               value={formData.resourceId}
               onChange={handleChange}
+              min="1"
               readOnly={Boolean(resourceId)}
               style={{
                 background: resourceId ? '#eee' : '#fff',

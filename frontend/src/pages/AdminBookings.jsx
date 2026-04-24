@@ -118,10 +118,10 @@ const AdminBookings = ({ user }) => {
 
   // Helper: check if resource is booked (approved) or pending
   const isResourceBooked = (resourceId) => {
-    return bookings.some(b => b.resourceId === String(resourceId) && b.status === 'APPROVED');
+    return bookings.some(b => Number(b.resourceId) === Number(resourceId) && b.status === 'APPROVED');
   };
   const isResourcePending = (resourceId) => {
-    return bookings.some(b => b.resourceId === String(resourceId) && b.status === 'PENDING');
+    return bookings.some(b => Number(b.resourceId) === Number(resourceId) && b.status === 'PENDING');
   };
 
   const groupedResources = groupResourcesByBuilding(resources);
@@ -145,8 +145,8 @@ const AdminBookings = ({ user }) => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '14px' }}>
                       {groupedResources['Main Building'].map(hall => {
                         let status = 'available';
-                        if (isResourceBooked(hall.name)) status = 'booked';
-                        else if (isResourcePending(hall.name)) status = 'pending';
+                        if (isResourceBooked(hall.id)) status = 'booked';
+                        else if (isResourcePending(hall.id)) status = 'pending';
                         let style = {
                           padding: '18px 0',
                           border: '2px solid #43a047',
@@ -213,8 +213,8 @@ const AdminBookings = ({ user }) => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '14px' }}>
                       {groupedResources['New Building'].map(hall => {
                         let status = 'available';
-                        if (isResourceBooked(hall.name)) status = 'booked';
-                        else if (isResourcePending(hall.name)) status = 'pending';
+                        if (isResourceBooked(hall.id)) status = 'booked';
+                        else if (isResourcePending(hall.id)) status = 'pending';
                         let style = {
                           padding: '18px 0',
                           border: '2px solid #43a047',
