@@ -4,13 +4,15 @@ import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import MyBookings from './pages/MyBookings';
 import AdminBookings from './pages/AdminBookings';
+import AdminResourcesApp from './pages/AdminResources';
+import UserResourcesApp from './pages/UserResources';
 import './App.css';
 
 const queryClient = new QueryClient();
 
 function App() {
   // Mock auth - replace with actual OAuth later
-  const userMock = {
+  const mockUser = {
     id: 1,
     name: 'John Doe',
     email: 'john@example.com',
@@ -31,8 +33,12 @@ function App() {
           <Toaster position="top-right" />
           <Routes>
             <Route path="/" element={<Navigate to="/my-bookings" />} />
-            <Route path="/my-bookings" element={<MyBookings user={userMock} />} />
+            {/* Your Booking Routes */}
+            <Route path="/my-bookings" element={<MyBookings user={mockUser} />} />
             <Route path="/admin-bookings" element={<AdminBookings user={adminMock} />} />
+            {/* Resource Routes from main */}
+            <Route path="/user-resources" element={<UserResourcesApp userName={mockUser.name} userInitial="U" />} />
+            <Route path="/admin-resources" element={<AdminResourcesApp adminName={adminMock.name} adminInitial="A" />} />
           </Routes>
         </div>
       </Router>
