@@ -10,11 +10,18 @@ const queryClient = new QueryClient();
 
 function App() {
   // Mock auth - replace with actual OAuth later
-  const mockUser = {
+  const userMock = {
     id: 1,
     name: 'John Doe',
     email: 'john@example.com',
-    role: 'USER' // or 'ADMIN'
+    role: 'USER'
+  };
+
+  const adminMock = {
+    id: 1,
+    name: 'Admin User',
+    email: 'admin@example.com',
+    role: 'ADMIN'
   };
 
   return (
@@ -24,8 +31,8 @@ function App() {
           <Toaster position="top-right" />
           <Routes>
             <Route path="/" element={<Navigate to="/my-bookings" />} />
-            <Route path="/my-bookings" element={<MyBookings user={mockUser} />} />
-            <Route path="/admin-bookings" element={<AdminBookings user={mockUser} />} />
+            <Route path="/my-bookings" element={<MyBookings user={userMock} />} />
+            <Route path="/admin-bookings" element={<AdminBookings user={adminMock} />} />
           </Routes>
         </div>
       </Router>
