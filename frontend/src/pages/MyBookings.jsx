@@ -12,6 +12,8 @@ const MyBookings = ({ user }) => {
   const [showForm, setShowForm] = useState(false);
   const [selectedResource, setSelectedResource] = useState(null);
   const [filter, setFilter] = useState('ALL');
+  const [mainSearch, setMainSearch] = useState('');
+  const [newSearch, setNewSearch] = useState('');
 
   useEffect(() => {
     loadBookings();
@@ -21,7 +23,10 @@ const MyBookings = ({ user }) => {
   const loadResources = async () => {
     try {
       const data = await resourceService.getAllResources();
-      setResources(data || []);
+      const deduped = Array.from(
+        new Map((data || []).map((resource) => [resource.name, resource])).values()
+      );
+      setResources(deduped);
     } catch (error) {
       toast.error('Failed to load halls');
     }
@@ -38,10 +43,16 @@ const MyBookings = ({ user }) => {
 
   // Helper: check if resource is booked for today (or selected date)
   const isResourceBooked = (resourceId) => {
-    return bookings.some(b => Number(b.resourceId) === Number(resourceId) && b.status === 'APPROVED');
+    return bookings.some(b => b.resourceId === String(resourceId) && b.status === 'APPROVED');
   };
 
   const groupedResources = groupResourcesByBuilding(resources);
+  const filteredMainHalls = groupedResources['Main Building'].filter((hall) =>
+    hall.name.toLowerCase().includes(mainSearch.toLowerCase().trim())
+  );
+  const filteredNewHalls = groupedResources['New Building'].filter((hall) =>
+    hall.name.toLowerCase().includes(newSearch.toLowerCase().trim())
+  );
 
   // Expand/collapse state for each building
   const [expandMain, setExpandMain] = useState(false);
@@ -101,15 +112,31 @@ const MyBookings = ({ user }) => {
           {/* Main Building Section - Unified Grid with Expand/Collapse */}
           <div style={{ flex: 1, minWidth: 340, background: '#f8f9fa', borderRadius: '12px', boxShadow: '0 2px 8px #0001', padding: '24px', marginBottom: '32px' }}>
             <h2 style={{ marginBottom: 18, color: '#1a237e', letterSpacing: 1 }}>Main Building</h2>
+            <input
+              type="text"
+              placeholder="Search Main Building halls..."
+              value={mainSearch}
+              onChange={(e) => setMainSearch(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: 8,
+                border: '1px solid #c7d2fe',
+                marginBottom: 14,
+                outline: 'none'
+              }}
+            />
             {groupedResources['Main Building'].length === 0 ? (
               <div style={{ color: '#888' }}>No halls found</div>
+            ) : filteredMainHalls.length === 0 ? (
+              <div style={{ color: '#888' }}>No halls match your search</div>
             ) : (
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '14px' }}>
-                  {(expandMain ? groupedResources['Main Building'] : groupedResources['Main Building'].slice(0, 8)).map(hall => {
+                  {(expandMain ? filteredMainHalls : filteredMainHalls.slice(0, 8)).map(hall => {
                     let status = 'available';
-                    if (bookings.some(b => Number(b.resourceId) === Number(hall.id) && b.status === 'APPROVED')) status = 'booked';
-                    else if (bookings.some(b => Number(b.resourceId) === Number(hall.id) && b.status === 'PENDING')) status = 'pending';
+                    if (bookings.some(b => b.resourceId === hall.name && b.status === 'APPROVED')) status = 'booked';
+                    else if (bookings.some(b => b.resourceId === hall.name && b.status === 'PENDING')) status = 'pending';
                     let style = {
                       padding: '18px 0',
                       border: '2px solid #43a047',
@@ -165,7 +192,7 @@ const MyBookings = ({ user }) => {
                         style={style}
                         onClick={() => {
                           if (status === 'available') {
-                            setSelectedResource(hall.id);
+                            setSelectedResource(hall.name);
                             setShowForm(true);
                           }
                         }}
@@ -177,7 +204,7 @@ const MyBookings = ({ user }) => {
                     );
                   })}
                 </div>
-                {groupedResources['Main Building'].length > 8 && (
+                {filteredMainHalls.length > 8 && (
                   <button
                     style={{ margin: '12px auto 0', display: 'block', padding: '6px 18px', borderRadius: 6, border: '1px solid #1a237e', background: '#fff', color: '#1a237e', fontWeight: 600, cursor: 'pointer' }}
                     onClick={() => setExpandMain(e => !e)}
@@ -191,15 +218,31 @@ const MyBookings = ({ user }) => {
           {/* New Building Section - Unified Grid with Expand/Collapse */}
           <div style={{ flex: 1, minWidth: 340, background: '#f8f9fa', borderRadius: '12px', boxShadow: '0 2px 8px #0001', padding: '24px', marginBottom: '32px' }}>
             <h2 style={{ marginBottom: 18, color: '#00695c', letterSpacing: 1 }}>New Building</h2>
+            <input
+              type="text"
+              placeholder="Search New Building halls..."
+              value={newSearch}
+              onChange={(e) => setNewSearch(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: 8,
+                border: '1px solid #99f6e4',
+                marginBottom: 14,
+                outline: 'none'
+              }}
+            />
             {groupedResources['New Building'].length === 0 ? (
               <div style={{ color: '#888' }}>No halls found</div>
+            ) : filteredNewHalls.length === 0 ? (
+              <div style={{ color: '#888' }}>No halls match your search</div>
             ) : (
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '14px' }}>
-                  {(expandNew ? groupedResources['New Building'] : groupedResources['New Building'].slice(0, 8)).map(hall => {
+                  {(expandNew ? filteredNewHalls : filteredNewHalls.slice(0, 8)).map(hall => {
                     let status = 'available';
-                    if (bookings.some(b => Number(b.resourceId) === Number(hall.id) && b.status === 'APPROVED')) status = 'booked';
-                    else if (bookings.some(b => Number(b.resourceId) === Number(hall.id) && b.status === 'PENDING')) status = 'pending';
+                    if (bookings.some(b => b.resourceId === hall.name && b.status === 'APPROVED')) status = 'booked';
+                    else if (bookings.some(b => b.resourceId === hall.name && b.status === 'PENDING')) status = 'pending';
                     let style = {
                       padding: '18px 0',
                       border: '2px solid #43a047',
@@ -255,7 +298,7 @@ const MyBookings = ({ user }) => {
                         style={style}
                         onClick={() => {
                           if (status === 'available') {
-                            setSelectedResource(hall.id);
+                            setSelectedResource(hall.name);
                             setShowForm(true);
                           }
                         }}
@@ -267,7 +310,7 @@ const MyBookings = ({ user }) => {
                     );
                   })}
                 </div>
-                {groupedResources['New Building'].length > 8 && (
+                {filteredNewHalls.length > 8 && (
                   <button
                     style={{ margin: '12px auto 0', display: 'block', padding: '6px 18px', borderRadius: 6, border: '1px solid #00695c', background: '#fff', color: '#00695c', fontWeight: 600, cursor: 'pointer' }}
                     onClick={() => setExpandNew(e => !e)}

@@ -155,11 +155,11 @@ public class BookingServiceImpl implements BookingService {
     public Page<BookingResponse> getAllBookings(String resourceId, String userId, String status, 
                                                  LocalDate startDate, LocalDate endDate, 
                                                  Pageable pageable) {
-        Long resourceIdLong = (resourceId == null || resourceId.isBlank()) ? null : Long.parseLong(resourceId);
+        String resourceIdFilter = (resourceId == null || resourceId.isBlank()) ? null : resourceId.trim();
         Long userIdLong = (userId == null || userId.isBlank()) ? null : Long.parseLong(userId);
         BookingStatus bookingStatus = (status == null || status.isBlank()) ? null : BookingStatus.valueOf(status.toUpperCase());
 
-        return bookingRepository.findWithFilters(resourceIdLong, userIdLong, bookingStatus, startDate, endDate, pageable)
+        return bookingRepository.findWithFilters(resourceIdFilter, userIdLong, bookingStatus, startDate, endDate, pageable)
             .map(this::mapToResponse);
     }
     
