@@ -1,67 +1,114 @@
 package com.smartcampus.tickets.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "tickets")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Ticket {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private Long id;
+    
+    @Column(name = "user_id", nullable = false)
     private Long userId;
-    private Long resourceId;
-    private String category;
+    
+    @Column(name = "resource_id")
+    private String resourceId;
+    
+    @Column(name = "created_by")
+    private Long createdBy;
+    
+    @NotNull(message = "Category is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private TicketCategory category;
+    
+    @NotBlank(message = "Title is required")
+    @Column(name = "title", nullable = false)
+    private String title;
+    
+    @NotBlank(message = "Description is required")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
-    private String priority;
+    
+    @NotNull(message = "Priority is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority", nullable = false)
+    private TicketPriority priority;
+    
+    @Column(name = "contact_details")
+    private String contactDetails;
+    
+    @NotNull(message = "Status is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private TicketStatus status;
-
-    public Long getId() {
-        return id;
+    
+    @Column(name = "rejection_reason", columnDefinition = "TEXT")
+    private String rejectionReason;
+    
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+    
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TicketAttachment> attachments;
+    
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TicketComment> comments;
+    
+    @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private TechnicianAssignment assignment;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        if (status == null) {
+            status = TicketStatus.OPEN;
+        }
+        if (createdBy == null) {
+            createdBy = userId;
+        }
     }
-
-    public void setId(Long id) {
-        this.id = id;
+    
+    public enum TicketCategory {
+        EQUIPMENT_DAMAGE,
+        SOFTWARE_ISSUE,
+        NETWORK_PROBLEM,
+        FACILITY_MAINTENANCE,
+        CLEANING_REQUEST,
+        SECURITY_ISSUE,
+        OTHER
     }
-
-    public Long getUserId() {
-        return userId;
+    
+    public enum TicketPriority {
+        LOW,
+        MEDIUM,
+        HIGH,
+        URGENT
     }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(Long resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
-    }
-
-    public TicketStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TicketStatus status) {
-        this.status = status;
+    
+    public enum TicketStatus {
+        OPEN,
+        ASSIGNED,
+        IN_PROGRESS,
+        RESOLVED,
+        COMPLETED,
+        CLOSED,
+        REJECTED
     }
 }

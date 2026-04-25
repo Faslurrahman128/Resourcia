@@ -1,49 +1,30 @@
 package com.smartcampus.tickets.dto;
 
+import com.smartcampus.tickets.model.Ticket;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+@Data
 public class TicketCreateRequest {
-    private Long resourceId;
-    private String category;
+    
+    @NotNull(message = "User ID is required")
+    private Long userId;
+    
+    private String resourceId;
+    
+    @NotNull(message = "Category is required")
+    private Ticket.TicketCategory category;
+    
+    @NotBlank(message = "Title is required")
+    private String title;
+    
+    @NotBlank(message = "Description is required")
     private String description;
-    private String priority;
+    
+    @NotNull(message = "Priority is required")
+    private Ticket.TicketPriority priority;
+    
     private String contactDetails;
-
-    public Long getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(Long resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
-    }
-
-    public String getContactDetails() {
-        return contactDetails;
-    }
-
-    public void setContactDetails(String contactDetails) {
-        this.contactDetails = contactDetails;
-    }
 }
