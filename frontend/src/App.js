@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import MyBookings from './pages/MyBookings';
 import AdminBookings from './pages/AdminBookings';
 import TicketDashboard from './modules/tickets/pages/TicketDashboard';
+import AdminResourcesApp from './pages/AdminResources';
+import UserResourcesApp from './pages/UserResources';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ function App() {
             <Route path="/my-bookings" element={<MyBookings user={mockUser} />} />
             <Route path="/admin-bookings" element={<AdminBookings user={mockUser} />} />
             <Route path="/tickets" element={<TicketDashboard userId={mockUser.id} userRole={mockUser.role.toLowerCase()} />} />
+            <Route path="/user-resources" element={<UserResourcesApp userName={mockUser.name} userInitial="U" />} />
+            <Route path="/admin-resources" element={<AdminResourcesApp adminName={mockUser.name} adminInitial="A" />} />
           </Routes>
         </div>
       </Router>

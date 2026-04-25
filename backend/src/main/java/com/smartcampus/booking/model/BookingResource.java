@@ -1,4 +1,4 @@
-package com.smartcampus.booking.model;
+ package com.smartcampus.booking.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -6,11 +6,11 @@ import lombok.AllArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "resources")
+@Table(name = "booking_resources")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Resource {
+public class BookingResource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "resource_id")

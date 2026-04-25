@@ -1,8 +1,8 @@
 ﻿spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/smartcampus
+    url: jdbc:mysql://localhost:3306/smart_campus?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: Hinam2002
+    password: 200377513376
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
