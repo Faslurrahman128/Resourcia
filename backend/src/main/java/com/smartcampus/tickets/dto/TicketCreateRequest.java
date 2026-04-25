@@ -12,10 +12,13 @@ public class TicketCreateRequest {
     @NotNull(message = "User ID is required")
     private Long userId;
     
-    private Long resourceId;
+    private String resourceId;
     
     @NotNull(message = "Category is required")
     private Ticket.TicketCategory category;
+    
+    @NotBlank(message = "Title is required")
+    private String title;
     
     @NotBlank(message = "Description is required")
     private String description;

@@ -87,7 +87,9 @@ const TicketDashboard = ({ userId, userRole }) => {
         </div>
 
         {/* Main Content */}
-        <div key={refreshKey} className="animate-fadeIn">
+        <div key={refreshKey} style={{
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
           {currentView === 'list' && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
               <TicketList
@@ -118,23 +120,6 @@ const TicketDashboard = ({ userId, userRole }) => {
           )}
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 };

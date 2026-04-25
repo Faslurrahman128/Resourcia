@@ -20,20 +20,27 @@ import java.util.List;
 public class Ticket {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ticket_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private Long id;
     
     @Column(name = "user_id", nullable = false)
     private Long userId;
     
     @Column(name = "resource_id")
-    private Long resourceId;
+    private String resourceId;
+    
+    @Column(name = "created_by")
+    private Long createdBy;
     
     @NotNull(message = "Category is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
     private TicketCategory category;
+    
+    @NotBlank(message = "Title is required")
+    @Column(name = "title", nullable = false)
+    private String title;
     
     @NotBlank(message = "Description is required")
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -73,6 +80,9 @@ public class Ticket {
         if (status == null) {
             status = TicketStatus.OPEN;
         }
+        if (createdBy == null) {
+            createdBy = userId;
+        }
     }
     
     public enum TicketCategory {
@@ -94,8 +104,10 @@ public class Ticket {
     
     public enum TicketStatus {
         OPEN,
+        ASSIGNED,
         IN_PROGRESS,
         RESOLVED,
+        COMPLETED,
         CLOSED,
         REJECTED
     }

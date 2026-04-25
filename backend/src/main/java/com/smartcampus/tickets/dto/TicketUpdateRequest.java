@@ -7,8 +7,9 @@ import lombok.Data;
 public class TicketUpdateRequest {
     
     private Long userId;
-    private Long resourceId;
+    private String resourceId;
     private Ticket.TicketCategory category;
+    private String title;
     private String description;
     private Ticket.TicketPriority priority;
     private String contactDetails;

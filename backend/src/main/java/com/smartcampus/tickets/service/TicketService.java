@@ -29,6 +29,7 @@ public class TicketService {
                 .userId(request.getUserId())
                 .resourceId(request.getResourceId())
                 .category(request.getCategory())
+                .title(request.getTitle())
                 .description(request.getDescription())
                 .priority(request.getPriority())
                 .contactDetails(request.getContactDetails())

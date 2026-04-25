@@ -1,12 +1,19 @@
 import axios from 'axios';
 
-const API_BASE_URL = '/api/tickets';
+const API_BASE_URL = 'http://localhost:8080/api/tickets';
 
 const ticketService = {
   // Ticket CRUD operations
-  createTicket: async (ticketData, createdBy) => {
-    const response = await axios.post(`${API_BASE_URL}?createdBy=${createdBy}`, ticketData);
-    return response.data;
+  createTicket: async (ticketData) => {
+    console.log('Creating ticket with data:', ticketData);
+    try {
+      const response = await axios.post(`${API_BASE_URL}`, ticketData);
+      console.log('Ticket creation response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Ticket creation error:', error);
+      throw error;
+    }
   },
 
   getTicket: async (ticketId) => {

@@ -198,6 +198,7 @@ const TicketDetail = ({ ticket, userId, userRole, onBack, onUpdate }) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <h1 className="text-3xl font-bold text-gray-900 mb-3">Ticket #{ticketData.id}</h1>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">{ticketData.title}</h2>
             <p className="text-gray-700 text-lg mb-6 leading-relaxed">{ticketData.description}</p>
             
             <div className="flex flex-wrap gap-3 mb-6">

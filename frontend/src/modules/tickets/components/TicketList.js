@@ -39,8 +39,7 @@ const TicketList = ({ userId, userRole, onTicketSelect }) => {
 
   const filteredTickets = tickets.filter(ticket => 
     ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ticket.location?.toLowerCase().includes(searchTerm.toLowerCase())
+    ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status) => {
@@ -89,7 +88,7 @@ const TicketList = ({ userId, userRole, onTicketSelect }) => {
               </div>
               <input
                 type="text"
-                placeholder="Search tickets by title, description, or location..."
+                placeholder="Search tickets by title or description..."
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
